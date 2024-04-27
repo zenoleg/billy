@@ -1,0 +1,22 @@
+version: '3.8'
+
+volumes:
+  binomeme_data:
+
+networks:
+  binomeme:
+    external: true
+
+services:
+  binomeme:
+    networks:
+      - binomeme
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - binomeme_data:/app/data
+    env_file:
+      - .env
