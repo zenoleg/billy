@@ -3,9 +3,12 @@ package rating
 import "slices"
 
 type (
-	MemberID  string
-	PostID    string
-	Reaction  string
+	MemberID string
+	PostID   string
+	Reaction struct {
+		reaction string
+		count    int
+	}
 	Reactions []Reaction
 
 	Member struct {
@@ -13,23 +16,30 @@ type (
 		name string
 	}
 
-	Post struct {
+	Meme struct {
 		postID string
 		from   MemberID
 		score  int
 	}
 )
 
-func NewPost(postID string, from MemberID, reactions Reactions) Post {
-	return Post{postID: postID, from: from, score: reactions.Score()}
+func NewMeme(postID string, from MemberID, reactions Reactions) Meme {
+	return Meme{postID: postID, from: from, score: reactions.Score()}
+}
+
+func NewMemberID(value string) MemberID {
+	return MemberID(value)
 }
 
 func NewMember(ID MemberID, name string) Member {
 	return Member{id: ID, name: name}
 }
 
-func NewReaction(value string) Reaction {
-	return Reaction(value)
+func NewReaction(reaction string, count int) Reaction {
+	return Reaction{
+		reaction: reaction,
+		count:    count,
+	}
 }
 
 func NewReactions(reactions []Reaction) Reactions {
@@ -37,14 +47,14 @@ func NewReactions(reactions []Reaction) Reactions {
 }
 
 func (r Reaction) Score() int {
-	if slices.Contains([]Reaction{"+1"}, r) {
-		return 1
+	if slices.Contains([]string{"+1"}, r.reaction) {
+		return 1 * r.count
 	}
-	if slices.Contains([]Reaction{"omegalul"}, r) {
-		return 2
+	if slices.Contains([]string{"omegalul"}, r.reaction) {
+		return 2 * r.count
 	}
-	if slices.Contains([]Reaction{"kekw"}, r) {
-		return 3
+	if slices.Contains([]string{"kekw"}, r.reaction) {
+		return 3 * r.count
 	}
 
 	return 0
