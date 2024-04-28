@@ -5,7 +5,6 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/zenoleg/binomeme/internal/transport"
-	"github.com/zenoleg/binomeme/internal/transport/slack"
 )
 
 type App struct {
@@ -13,12 +12,12 @@ type App struct {
 }
 
 func MakeApp(logger zerolog.Logger) (App, error) {
-	config, err := slack.NewConfigFromEnv()
+	config, err := transport.NewSlackConfigFromEnv()
 	if err != nil {
 		return App{}, err
 	}
 
-	bot := slack.NewBot(config, logger)
+	bot := transport.NewSlackBot(config, logger)
 
 	return App{bot: bot}, nil
 }
