@@ -2,20 +2,30 @@ package slack
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"emperror.dev/errors"
 	"github.com/rs/zerolog"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/socketmode"
+	"github.com/zenoleg/binomeme/internal/transport"
 )
 
-type Config struct {
-	appToken  string
-	authToken string
-	channelID string
-}
+type (
+	Config struct {
+		appToken  string
+		authToken string
+		channelID string
+	}
+	Server struct {
+		client    *socketmode.Client
+		logger    zerolog.Logger
+		channelID string
+	}
+	debugLogger struct {
+		logger zerolog.Logger
+	}
+)
 
 func NewConfigFromEnv() (Config, error) {
 	appToken, exists := os.LookupEnv("SLACK_APP_TOKEN")
@@ -40,10 +50,31 @@ func NewConfigFromEnv() (Config, error) {
 	}, nil
 }
 
-type Server struct {
-	client    *socketmode.Client
-	logger    zerolog.Logger
-	channelID string
+func NewBot(config Config, logger zerolog.Logger) transport.Bot {
+	debugLog := newDebugLogger(logger.With().Str("bot", "slack_socket").Logger())
+
+	client := slack.New(
+		config.authToken,
+		slack.OptionLog(debugLog),
+		slack.OptionDebug(true),
+		slack.OptionAppLevelToken(config.appToken),
+	)
+
+	socketClient := socketmode.New(
+		client,
+		socketmode.OptionDebug(true),
+		socketmode.OptionLog(debugLog),
+	)
+
+	return &Server{
+		client:    socketClient,
+		logger:    logger,
+		channelID: config.channelID,
+	}
+}
+
+func newDebugLogger(logger zerolog.Logger) debugLogger {
+	return debugLogger{logger: logger}
 }
 
 func (s Server) Run(ctx context.Context) error {
@@ -52,22 +83,8 @@ func (s Server) Run(ctx context.Context) error {
 	return s.client.RunContext(ctx)
 }
 
-func NewBot(config Config, logger zerolog.Logger) *Server {
-	client := slack.New(
-		config.authToken,
-		slack.OptionDebug(true),
-		slack.OptionAppLevelToken(config.appToken),
-	)
+func (l debugLogger) Output(i int, msg string) error {
+	l.logger.Debug().Msg(msg)
 
-	socketClient := socketmode.New(
-		client,
-		socketmode.OptionDebug(true),
-		socketmode.OptionLog(log.New(os.Stdout, "socketmode: ", log.Lshortfile|log.LstdFlags)),
-	)
-
-	return &Server{
-		client:    socketClient,
-		logger:    logger,
-		channelID: config.channelID,
-	}
+	return nil
 }
