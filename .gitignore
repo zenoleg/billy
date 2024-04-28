@@ -19,3 +19,9 @@
 
 # Go workspace file
 go.work
+.idea/
+.idea_modules/
+.DS_Store
+.AppleDouble
+.LSOverride
+.env

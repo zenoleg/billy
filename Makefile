@@ -1,10 +1,7 @@
-.PHONY: dc run test lint
-
-dc:
-	docker-compose up  --remove-orphans --build
+.PHONY: run test lint
 
 run:
-	go run cmd/binomeme/main.go
+	go run cmd/binomeme/main.go && ./binomeme
 
 test:
 	go test -race ./...
