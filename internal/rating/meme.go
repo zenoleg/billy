@@ -40,6 +40,16 @@ func (m Meme) Rate(score int) Meme {
 	return m
 }
 
+func (m Meme) Underrate(score int) Meme {
+	m.score = m.score - score
+
+	if m.score < 0 {
+		m.score = 0
+	}
+
+	return m
+}
+
 func NewMemberID(value string) MemberID {
 	return MemberID(value)
 }

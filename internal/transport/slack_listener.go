@@ -14,20 +14,23 @@ import (
 type SlackEventListener struct {
 	client     *socketmode.Client
 	initRating usecase.InitRating
-	rate       usecase.Rate
+	like       usecase.Like
+	dislike    usecase.Dislike
 	logger     zerolog.Logger
 }
 
 func NewSlackEventListener(
 	client *socketmode.Client,
 	initRating usecase.InitRating,
-	rate usecase.Rate,
+	like usecase.Like,
+	dislike usecase.Dislike,
 	logger zerolog.Logger,
 ) SlackEventListener {
 	return SlackEventListener{
 		client:     client,
 		initRating: initRating,
-		rate:       rate,
+		like:       like,
+		dislike:    dislike,
 		logger:     logger,
 	}
 }
@@ -63,9 +66,14 @@ func (l SlackEventListener) Start(ctx context.Context) {
 
 						switch ev := innerEvent.Data.(type) {
 						case *slackevents.ReactionAddedEvent:
-							err := l.rate.Handle(ev.Item.Timestamp, rating.NewReaction(ev.Reaction, 1))
+							err := l.like.Handle(ev.Item.Timestamp, rating.NewReaction(ev.Reaction, 1))
 							if err != nil {
-								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not rate a meme")
+								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not like a meme")
+							}
+						case *slackevents.ReactionRemovedEvent:
+							err := l.dislike.Handle(ev.Item.Timestamp, rating.NewReaction(ev.Reaction, 1))
+							if err != nil {
+								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not dislike a meme")
 							}
 						}
 					}

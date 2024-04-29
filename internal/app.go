@@ -30,9 +30,10 @@ func MakeApp(logger zerolog.Logger) (App, func(), error) {
 	}
 
 	initRating := usecase.NewInitRating(sqliteMemeStorage, rating.NewSlackMemeScanner(client, logger))
-	rate := usecase.NewRate(sqliteMemeStorage, logger)
+	like := usecase.NewLike(sqliteMemeStorage, logger)
+	dislike := usecase.NewDislike(sqliteMemeStorage, logger)
 
-	listener := transport.NewSlackEventListener(client, initRating, rate, logger)
+	listener := transport.NewSlackEventListener(client, initRating, like, dislike, logger)
 
 	return App{bot: bot, listener: listener}, closeFunc, nil
 }
