@@ -4,7 +4,6 @@ import "slices"
 
 type (
 	MemberID string
-	PostID   string
 	Reaction struct {
 		reaction string
 		count    int
@@ -17,14 +16,15 @@ type (
 	}
 
 	Meme struct {
-		id    string
-		from  MemberID
-		score int
+		id        string
+		channelID string
+		from      MemberID
+		score     int
 	}
 )
 
-func NewMeme(id string, from MemberID, reactions Reactions) Meme {
-	return Meme{id: id, from: from, score: reactions.Score()}
+func NewMeme(id string, channelID string, from MemberID, reactions Reactions) Meme {
+	return Meme{id: id, channelID: channelID, from: from, score: reactions.Score()}
 }
 
 func NewMemberID(value string) MemberID {

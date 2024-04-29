@@ -10,20 +10,17 @@ import (
 )
 
 type SlackEventListener struct {
-	channelID  string
 	client     *socketmode.Client
 	initRating usecase.InitRating
 	logger     zerolog.Logger
 }
 
 func NewSlackEventListener(
-	channelID string,
 	client *socketmode.Client,
 	initRating usecase.InitRating,
 	logger zerolog.Logger,
 ) SlackEventListener {
 	return SlackEventListener{
-		channelID:  channelID,
 		client:     client,
 		initRating: initRating,
 		logger:     logger,
@@ -44,7 +41,7 @@ func (l SlackEventListener) Start(ctx context.Context) {
 					data := evt.Data.(slack.SlashCommand)
 					switch data.Command {
 					case "/init":
-						err := l.initRating.Handle(l.channelID)
+						err := l.initRating.Handle(data.ChannelID)
 						if err != nil {
 							l.logger.Err(err).Msg("Can not initialize rating")
 						}

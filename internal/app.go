@@ -25,7 +25,7 @@ func MakeApp(logger zerolog.Logger) (App, error) {
 
 	initRating := usecase.NewInitRating(rating.NewInMemoryMemeStorage(), rating.NewSlackMemeScanner(client, logger))
 
-	listener := transport.NewSlackEventListener("C071261NPMJ", client, initRating, logger)
+	listener := transport.NewSlackEventListener(client, initRating, logger)
 
 	return App{bot: bot, listener: listener}, nil
 }
