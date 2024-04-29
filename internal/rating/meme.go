@@ -17,14 +17,14 @@ type (
 	}
 
 	Meme struct {
-		postID string
-		from   MemberID
-		score  int
+		id    string
+		from  MemberID
+		score int
 	}
 )
 
-func NewMeme(postID string, from MemberID, reactions Reactions) Meme {
-	return Meme{postID: postID, from: from, score: reactions.Score()}
+func NewMeme(id string, from MemberID, reactions Reactions) Meme {
+	return Meme{id: id, from: from, score: reactions.Score()}
 }
 
 func NewMemberID(value string) MemberID {
