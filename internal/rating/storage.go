@@ -9,7 +9,7 @@ import (
 type (
 	MemeStorage interface {
 		Get(id string) (Meme, error)
-		Save(meme Meme) error
+		Save(memes ...Meme) error
 	}
 
 	InMemoryMemeStorage struct {
@@ -34,11 +34,13 @@ func (i *InMemoryMemeStorage) Get(id string) (Meme, error) {
 	return meme, nil
 }
 
-func (i *InMemoryMemeStorage) Save(meme Meme) error {
+func (i *InMemoryMemeStorage) Save(memes ...Meme) error {
 	i.mx.Lock()
 	defer i.mx.Unlock()
 
-	i.memes[meme.id] = meme
+	for _, meme := range memes {
+		i.memes[meme.id] = meme
+	}
 
 	return nil
 }
