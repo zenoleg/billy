@@ -35,7 +35,9 @@ func run() error {
 		log.Fatal().Err(err).Msg("Can not load .env")
 	}
 
-	app, err := internal.MakeApp(log)
+	app, closeFunc, err := internal.MakeApp(log)
+	defer closeFunc()
+
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create app")
 	}

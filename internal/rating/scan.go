@@ -53,7 +53,15 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, error) {
 				reactions = append(reactions, NewReaction(reactionInfo.Name, reactionInfo.Count))
 			}
 
-			memes = append(memes, NewMeme(message.Timestamp, channelID, NewMemberID(message.User), NewReactions(reactions)))
+			memes = append(
+				memes,
+				NewMeme(
+					message.Timestamp,
+					channelID,
+					NewMemberID(message.User),
+					NewReactions(reactions),
+					message.Timestamp),
+			)
 		}
 
 		if !conversationResponse.HasMore {

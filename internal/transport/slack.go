@@ -25,10 +25,6 @@ type (
 		client *socketmode.Client
 		logger zerolog.Logger
 	}
-
-	debugLogger struct {
-		logger zerolog.Logger
-	}
 )
 
 func NewSlackConfigFromEnv() (SlackConfig, error) {
@@ -55,20 +51,12 @@ func NewSlackConfigFromEnv() (SlackConfig, error) {
 }
 
 func NewSlackClient(config SlackConfig, logger zerolog.Logger) *socketmode.Client {
-	debugLog := newDebugLogger(logger.With().Str("bot", "slack_socket").Logger())
-
 	client := slack.New(
 		config.authToken,
-		slack.OptionLog(debugLog),
-		slack.OptionDebug(true),
 		slack.OptionAppLevelToken(config.appToken),
 	)
 
-	return socketmode.New(
-		client,
-		socketmode.OptionDebug(true),
-		socketmode.OptionLog(debugLog),
-	)
+	return socketmode.New(client)
 }
 
 func NewSlackBot(client *socketmode.Client, logger zerolog.Logger) Bot {
@@ -78,18 +66,8 @@ func NewSlackBot(client *socketmode.Client, logger zerolog.Logger) Bot {
 	}
 }
 
-func newDebugLogger(logger zerolog.Logger) debugLogger {
-	return debugLogger{logger: logger}
-}
-
 func (s SlackServer) Run(ctx context.Context) error {
 	s.logger.Info().Msg("🚀 Starting Slack Server")
 
 	return s.client.RunContext(ctx)
-}
-
-func (l debugLogger) Output(i int, msg string) error {
-	l.logger.Debug().Msg(msg)
-
-	return nil
 }

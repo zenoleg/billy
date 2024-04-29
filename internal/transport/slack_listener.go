@@ -29,7 +29,7 @@ func NewSlackEventListener(
 
 func (l SlackEventListener) Start(ctx context.Context) {
 	go func() {
-		l.logger.Info().Msg("Slack event listener started")
+		l.logger.Info().Msg("👂 Slack event listener started")
 
 		for {
 			select {
