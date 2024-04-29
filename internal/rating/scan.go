@@ -74,7 +74,7 @@ func (l LoggedScanner) Scan(channelID string) ([]Meme, error) {
 		return []Meme{}, err
 	}
 
-	l.logger.Info().Int("memes", len(memes)).Str("channel_id", channelID).Msg("✅ Channel conversation scanned successfully")
+	l.logger.Info().Int("meme_count", len(memes)).Str("channel_id", channelID).Msg("✅ Channel conversation scanned successfully")
 
 	return memes, nil
 }
