@@ -5,24 +5,29 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/slack-go/slack"
+	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
+	"github.com/zenoleg/binomeme/internal/rating"
 	"github.com/zenoleg/binomeme/internal/rating/usecase"
 )
 
 type SlackEventListener struct {
 	client     *socketmode.Client
 	initRating usecase.InitRating
+	rate       usecase.Rate
 	logger     zerolog.Logger
 }
 
 func NewSlackEventListener(
 	client *socketmode.Client,
 	initRating usecase.InitRating,
+	rate usecase.Rate,
 	logger zerolog.Logger,
 ) SlackEventListener {
 	return SlackEventListener{
 		client:     client,
 		initRating: initRating,
+		rate:       rate,
 		logger:     logger,
 	}
 }
@@ -47,8 +52,27 @@ func (l SlackEventListener) Start(ctx context.Context) {
 						}
 					}
 
+				case socketmode.EventTypeEventsAPI:
+					eventsAPIEvent, ok := evt.Data.(slackevents.EventsAPIEvent)
+					if !ok {
+						l.logger.Error().Msgf("unexpected event type: %s", evt.Type)
+					}
+
+					if eventsAPIEvent.Type == slackevents.CallbackEvent {
+						innerEvent := eventsAPIEvent.InnerEvent
+
+						switch ev := innerEvent.Data.(type) {
+						case *slackevents.ReactionAddedEvent:
+							err := l.rate.Handle(ev.Item.Timestamp, rating.NewReaction(ev.Reaction, 1))
+							if err != nil {
+								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not rate a meme")
+							}
+						}
+					}
+
 					l.client.Ack(*evt.Request)
 				}
+
 			case <-ctx.Done():
 				l.logger.Info().Msg("Slack event listener shutting down")
 

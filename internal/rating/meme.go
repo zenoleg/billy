@@ -34,6 +34,12 @@ func NewMeme(id string, channelID string, from MemberID, reactions Reactions, ti
 	}
 }
 
+func (m Meme) Rate(score int) Meme {
+	m.score = m.score + score
+
+	return m
+}
+
 func NewMemberID(value string) MemberID {
 	return MemberID(value)
 }

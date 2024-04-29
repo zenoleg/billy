@@ -93,7 +93,7 @@ func (s SQLiteMemeStorage) Save(memes ...Meme) error {
 		err = tx.Commit()
 	}()
 
-	stmt, err := tx.Prepare("INSERT INTO memes(id, channel_id, member_id, score, timestamp) VALUES (?, ?, ?, ?, ?)")
+	stmt, err := tx.Prepare("INSERT OR REPLACE INTO memes(id, channel_id, member_id, score, timestamp) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
