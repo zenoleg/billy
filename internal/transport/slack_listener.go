@@ -32,23 +32,31 @@ func NewSlackEventListener(
 
 func (l SlackEventListener) Start(ctx context.Context) {
 	go func() {
-		select {
-		case evt := <-l.client.Events:
-			switch evt.Type {
-			case socketmode.EventTypeSlashCommand:
-				data := evt.Data.(slack.SlashCommand)
-				switch data.Command {
-				case "/init":
-					err := l.initRating.Handle(l.channelID)
-					if err != nil {
-						l.logger.Err(err).Msg("Can not initialize rating")
-					}
-				}
+		l.logger.Info().Msg("Slack event listener started")
 
-				l.client.Ack(*evt.Request)
+		for {
+			select {
+			case evt := <-l.client.Events:
+				l.logger.Debug().Msgf("Got event from Slack listener %#v", evt)
+
+				switch evt.Type {
+				case socketmode.EventTypeSlashCommand:
+					data := evt.Data.(slack.SlashCommand)
+					switch data.Command {
+					case "/init":
+						err := l.initRating.Handle(l.channelID)
+						if err != nil {
+							l.logger.Err(err).Msg("Can not initialize rating")
+						}
+					}
+
+					l.client.Ack(*evt.Request)
+				}
+			case <-ctx.Done():
+				l.logger.Info().Msg("Slack event listener shutting down")
+
+				return
 			}
-		case <-ctx.Done():
-			return
 		}
 	}()
 }

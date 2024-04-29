@@ -43,7 +43,7 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, error) {
 		}
 
 		for _, message := range conversationResponse.Messages {
-			if len(message.Attachments) == 0 {
+			if len(message.Files) == 0 {
 				// ignore message if there is no meme inside
 				continue
 			}

@@ -18,8 +18,8 @@ type (
 	}
 )
 
-func NewInMemoryMemeStorage(memes map[string]Meme) MemeStorage {
-	return &InMemoryMemeStorage{memes: memes, mx: sync.RWMutex{}}
+func NewInMemoryMemeStorage() MemeStorage {
+	return &InMemoryMemeStorage{memes: map[string]Meme{}, mx: sync.RWMutex{}}
 }
 
 func (i *InMemoryMemeStorage) Get(id string) (Meme, error) {
