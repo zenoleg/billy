@@ -29,7 +29,7 @@ type (
 		channelID string
 	}
 
-	TopMemesHandler struct {
+	TopMemes struct {
 		fetcher rating.TopMemeFetcher
 		client  *socketmode.Client
 		logger  zerolog.Logger
@@ -59,15 +59,15 @@ func NewTopMemesQuery(now time.Time, period TopPreset, channelID string) TopMeme
 	}
 }
 
-func NewTopMemesHandler(fetcher rating.TopMemeFetcher, client *socketmode.Client, logger zerolog.Logger) TopMemesHandler {
-	return TopMemesHandler{
+func NewTop(fetcher rating.TopMemeFetcher, client *socketmode.Client, logger zerolog.Logger) TopMemes {
+	return TopMemes{
 		fetcher: fetcher,
 		client:  client,
 		logger:  logger,
 	}
 }
 
-func (h TopMemesHandler) Handle(query TopMemesQuery) error {
+func (h TopMemes) Handle(query TopMemesQuery) error {
 	from, to := query.period.MakeFromAndTo(time.Now().UTC())
 
 	memeViews, err := h.fetcher.Fetch(rating.NewTopMemeCriterion(from, to, defaultLimit))
@@ -80,7 +80,7 @@ func (h TopMemesHandler) Handle(query TopMemesQuery) error {
 
 	placement := 1
 	for _, view := range memeViews {
-		memeInfo := fmt.Sprintf("%d. <%s|От %s. Score = %d\n", placement, view.Link, view.MemberFullName, view.Score)
+		memeInfo := fmt.Sprintf("%d. <%s|От %s> (%d)\n", placement, view.Link, view.MemberFullName, view.Score)
 		message.WriteString(memeInfo)
 
 		placement++

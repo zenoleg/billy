@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/slack-go/slack"
@@ -17,6 +18,7 @@ type SlackEventListener struct {
 	initRating usecase.InitRating
 	like       usecase.Like
 	dislike    usecase.Dislike
+	top        usecase.TopMemes
 	logger     zerolog.Logger
 }
 
@@ -25,6 +27,7 @@ func NewSlackEventListener(
 	initRating usecase.InitRating,
 	like usecase.Like,
 	dislike usecase.Dislike,
+	top usecase.TopMemes,
 	logger zerolog.Logger,
 ) SlackEventListener {
 	return SlackEventListener{
@@ -32,6 +35,7 @@ func NewSlackEventListener(
 		initRating: initRating,
 		like:       like,
 		dislike:    dislike,
+		top:        top,
 		logger:     logger,
 	}
 }
@@ -58,16 +62,32 @@ func (l SlackEventListener) Start(ctx context.Context) {
 						l.client.Ack(*evt.Request)
 
 					case "/top_posts_day":
-						fmt.Println("Called top_posts_day")
+						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopDay, data.ChannelID))
+						if err != nil {
+							l.logger.Err(err).Msg("Can not fetch top rating")
+						}
+
 						l.client.Ack(*evt.Request)
 					case "/top_posts_week":
-						fmt.Println("Called top_posts_week")
+						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopWeek, data.ChannelID))
+						if err != nil {
+							l.logger.Err(err).Msg("Can not fetch top rating")
+						}
+
 						l.client.Ack(*evt.Request)
 					case "/top_posts_month":
-						fmt.Println("Called top_posts_month")
+						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopMonth, data.ChannelID))
+						if err != nil {
+							l.logger.Err(err).Msg("Can not fetch top rating")
+						}
+
 						l.client.Ack(*evt.Request)
 					case "/top_posts_ever":
-						fmt.Println("Called top_authors_month")
+						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopEver, data.ChannelID))
+						if err != nil {
+							l.logger.Err(err).Msg("Can not fetch top rating")
+						}
+
 						l.client.Ack(*evt.Request)
 					case "/top_authors_week":
 						fmt.Println("Called top_authors_week")

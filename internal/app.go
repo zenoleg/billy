@@ -34,11 +34,21 @@ func MakeApp(logger zerolog.Logger) (App, func(), error) {
 	}
 
 	linkFetcher := rating.NewSlackLinkFetcher(client, logger)
+	topMemeFetcher := rating.NewSQLiteTopMemeFetcher(connection, logger)
+
 	initRating := usecase.NewInitRating(sqliteMemeStorage, rating.NewSlackMemeScanner(client, linkFetcher, logger), client)
 	like := usecase.NewLike(sqliteMemeStorage, linkFetcher, logger)
+	top := usecase.NewTop(topMemeFetcher, client, logger)
 	dislike := usecase.NewDislike(sqliteMemeStorage, linkFetcher, logger)
 
-	listener := transport.NewSlackEventListener(client, initRating, like, dislike, logger)
+	listener := transport.NewSlackEventListener(
+		client,
+		initRating,
+		like,
+		dislike,
+		top,
+		logger,
+	)
 
 	return App{bot: bot, listener: listener}, closeFunc, nil
 }
