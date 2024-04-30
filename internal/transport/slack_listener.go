@@ -89,14 +89,14 @@ func (l SlackEventListener) Start(ctx context.Context) {
 						}
 
 						l.client.Ack(*evt.Request)
-					case "/top_authors_week":
-						fmt.Println("Called top_authors_week")
+					case "/authors_week":
+						fmt.Println("Called authors_week")
 						l.client.Ack(*evt.Request)
-					case "/top_authors_month":
-						fmt.Println("Called top_authors_month")
+					case "/authors_month":
+						fmt.Println("Called authors_month")
 						l.client.Ack(*evt.Request)
-					case "/top_authors_ever":
-						fmt.Println("Called top_authors_ever")
+					case "/authors_ever":
+						fmt.Println("Called authors_ever")
 						l.client.Ack(*evt.Request)
 					}
 
