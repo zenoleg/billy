@@ -32,7 +32,7 @@ type (
 	}
 )
 
-func NewSqliteMemeStorage(dbPath string, logger zerolog.Logger) (SQLiteMemeStorage, func(), error) {
+func NewSqliteMemeStorage(dbPath string, logger zerolog.Logger) (MemeStorage, func(), error) {
 	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&mode=rwc&_journal_mode=WAL", dbPath))
 	if err != nil {
 		logger.Err(err).Msg("Can not open SQLite storage")
