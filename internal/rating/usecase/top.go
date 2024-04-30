@@ -51,6 +51,21 @@ func (p TopPreset) MakeFromAndTo(now time.Time) (time.Time, time.Time) {
 	return time.Time{}, time.Time{}
 }
 
+func (p TopPreset) Title() string {
+	switch p {
+	case TopDay:
+		return "🏆 Топ мемов за сегодня 🏆"
+	case TopWeek:
+		return "🏆 Топ мемов за неделю 🏆"
+	case TopMonth:
+		return "🏆 Топ мемов за месяц 🏆"
+	case TopEver:
+		return "🏆 Топ мемов за все время 🏆"
+	}
+
+	return "🏆 Топ мемов 🏆"
+}
+
 func NewTopMemesQuery(now time.Time, period TopPreset, channelID string) TopMemesQuery {
 	return TopMemesQuery{
 		now:       now,
@@ -76,11 +91,23 @@ func (h TopMemes) Handle(query TopMemesQuery) error {
 	}
 
 	message := strings.Builder{}
-	message.WriteString("🏆 Топ мемов 🏆\n\n")
+	message.WriteString(fmt.Sprintf("%s\n\n", query.period.Title()))
 
 	placement := 1
 	for _, view := range memeViews {
-		memeInfo := fmt.Sprintf("%d. <%s|От %s> (%d)\n", placement, view.Link, view.MemberFullName, view.Score)
+		medal := ""
+
+		switch placement {
+		case 1:
+			medal = "🥇 "
+		case 2:
+			medal = "🥈 "
+		case 3:
+			medal = "🥉 "
+		default:
+		}
+
+		memeInfo := fmt.Sprintf("%s%d. <%s|От %s> (%d)\n", medal, placement, view.Link, view.MemberFullName, view.Score)
 		message.WriteString(memeInfo)
 
 		placement++
