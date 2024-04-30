@@ -59,18 +59,25 @@ func (l SlackEventListener) Start(ctx context.Context) {
 
 					case "/top_posts_day":
 						fmt.Println("Called top_posts_day")
+						l.client.Ack(*evt.Request)
 					case "/top_posts_week":
 						fmt.Println("Called top_posts_week")
+						l.client.Ack(*evt.Request)
 					case "/top_posts_month":
 						fmt.Println("Called top_posts_month")
+						l.client.Ack(*evt.Request)
 					case "/top_posts_ever":
 						fmt.Println("Called top_authors_month")
+						l.client.Ack(*evt.Request)
 					case "/top_authors_week":
 						fmt.Println("Called top_authors_week")
+						l.client.Ack(*evt.Request)
 					case "/top_authors_month":
 						fmt.Println("Called top_authors_month")
+						l.client.Ack(*evt.Request)
 					case "/top_authors_ever":
 						fmt.Println("Called top_authors_ever")
+						l.client.Ack(*evt.Request)
 					}
 
 				case socketmode.EventTypeEventsAPI:
