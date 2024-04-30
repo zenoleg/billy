@@ -33,7 +33,7 @@ func (r InitRating) Handle(channelID string) error {
 		return err
 	}
 
-	_, _, err = r.client.PostMessage(channelID, slack.MsgOptionText(fmt.Sprintf("Дико извеняюс пробегал кобанчиком увидел ваш канал чё тут? АХАХХААХ бляяя 20+ лет люди сидят картинки смешные оценивают, я в ваших годах уже старший слесарь был)) ладно до встречи Задроты бляя)))\n\nНашел %d кринжовых мема и составил список на увольнение: \n\n/top_posts_day\n/top_posts_week\n/top_posts_month\n/top_authros_week\n/top_authors_month", len(memes)), false))
+	_, _, err = r.client.PostMessage(channelID, slack.MsgOptionText(fmt.Sprintf("Дико извеняюс пробегал кобанчиком увидел ваш канал чё тут? АХАХХААХ бляяя 20+ лет люди сидят картинки смешные оценивают, я в ваших годах уже качалку окончил)) ладно до встречи Задроты бляя)))\n\nНашел %d кринжовых мема и составил список на увольнение: \n\n/memes_day\n/memes_week\n/memes_month\n/memes_ever\n/authros_week\n/authors_month\n/authors_ever", len(memes)), false))
 	if err != nil {
 		return err
 	}
