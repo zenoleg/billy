@@ -21,16 +21,18 @@ type (
 		memberID  MemberID
 		score     int
 		timestamp string
+		link      string
 	}
 )
 
-func NewMeme(id string, channelID string, from MemberID, reactions Reactions, timestamp string) Meme {
+func NewMeme(id string, channelID string, from MemberID, reactions Reactions, timestamp string, link string) Meme {
 	return Meme{
 		id:        id,
 		channelID: channelID,
 		memberID:  from,
 		score:     reactions.Score(),
 		timestamp: timestamp,
+		link:      link,
 	}
 }
 

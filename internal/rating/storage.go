@@ -61,8 +61,8 @@ func NewSqliteMemeStorage(dbPath string, logger zerolog.Logger) (MemeStorage, fu
 func (s SQLiteMemeStorage) Get(id string) (Meme, error) {
 	meme := Meme{}
 
-	row := s.db.QueryRow("SELECT id, channel_id, member_id, score, timestamp FROM memes WHERE id = ?", id)
-	err := row.Scan(&meme.id, &meme.channelID, &meme.memberID, &meme.score, &meme.timestamp)
+	row := s.db.QueryRow("SELECT id, channel_id, member_id, score, timestamp, link FROM memes WHERE id = ?", id)
+	err := row.Scan(&meme.id, &meme.channelID, &meme.memberID, &meme.score, &meme.timestamp, &meme.link)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -93,14 +93,14 @@ func (s SQLiteMemeStorage) Save(memes ...Meme) error {
 		err = tx.Commit()
 	}()
 
-	stmt, err := tx.Prepare("INSERT OR REPLACE INTO memes(id, channel_id, member_id, score, timestamp) VALUES (?, ?, ?, ?, ?)")
+	stmt, err := tx.Prepare("INSERT OR REPLACE INTO memes(id, channel_id, member_id, score, timestamp, link) VALUES (?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
 	for _, meme := range memes {
-		_, err = stmt.Exec(meme.id, meme.channelID, meme.memberID, meme.score, meme.timestamp)
+		_, err = stmt.Exec(meme.id, meme.channelID, meme.memberID, meme.score, meme.timestamp, meme.link)
 		if err != nil {
 			return err
 		}
