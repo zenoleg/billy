@@ -53,6 +53,8 @@ func (l SlackEventListener) Start(ctx context.Context) {
 						if err != nil {
 							l.logger.Err(err).Msg("Can not initialize rating")
 						}
+
+						l.client.Ack(*evt.Request)
 					}
 
 				case socketmode.EventTypeEventsAPI:
@@ -77,6 +79,8 @@ func (l SlackEventListener) Start(ctx context.Context) {
 							if err != nil {
 								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not like a meme")
 							}
+
+							l.client.Ack(*evt.Request)
 						case *slackevents.ReactionRemovedEvent:
 							err := l.dislike.Handle(usecase.NewDislikeCommand(
 								ev.Item.Timestamp,
@@ -89,10 +93,10 @@ func (l SlackEventListener) Start(ctx context.Context) {
 							if err != nil {
 								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not dislike a meme")
 							}
+
+							l.client.Ack(*evt.Request)
 						}
 					}
-
-					l.client.Ack(*evt.Request)
 				}
 
 			case <-ctx.Done():
