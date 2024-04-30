@@ -43,10 +43,6 @@ func (m Meme) Rate(score int) Meme {
 func (m Meme) Underrate(score int) Meme {
 	m.score = m.score - score
 
-	if m.score < 0 {
-		m.score = 0
-	}
-
 	return m
 }
 
@@ -67,6 +63,10 @@ func NewReaction(reaction string, count int) Reaction {
 
 func NewReactions(reactions []Reaction) Reactions {
 	return Reactions(reactions)
+}
+
+func (r Reaction) String() string {
+	return r.reaction
 }
 
 func (r Reaction) Score() int {

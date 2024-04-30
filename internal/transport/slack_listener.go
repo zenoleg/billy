@@ -66,12 +66,26 @@ func (l SlackEventListener) Start(ctx context.Context) {
 
 						switch ev := innerEvent.Data.(type) {
 						case *slackevents.ReactionAddedEvent:
-							err := l.like.Handle(ev.Item.Timestamp, rating.NewReaction(ev.Reaction, 1))
+							err := l.like.Handle(usecase.NewLikeCommand(
+								ev.Item.Timestamp,
+								ev.Item.Channel,
+								rating.NewMemberID(ev.ItemUser),
+								ev.Reaction,
+								ev.Item.Timestamp,
+							))
+
 							if err != nil {
 								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not like a meme")
 							}
 						case *slackevents.ReactionRemovedEvent:
-							err := l.dislike.Handle(ev.Item.Timestamp, rating.NewReaction(ev.Reaction, 1))
+							err := l.dislike.Handle(usecase.NewDislikeCommand(
+								ev.Item.Timestamp,
+								ev.Item.Channel,
+								rating.NewMemberID(ev.ItemUser),
+								ev.Reaction,
+								ev.Item.Timestamp,
+							))
+
 							if err != nil {
 								l.logger.Err(err).Str("meme_id", ev.Item.Timestamp).Str("reaction", ev.Reaction).Msg("Can not dislike a meme")
 							}
