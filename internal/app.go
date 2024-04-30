@@ -22,8 +22,12 @@ func MakeApp(logger zerolog.Logger) (App, func(), error) {
 
 	client := transport.NewSlackClient(config, logger)
 	bot := transport.NewSlackBot(client, logger)
+	connection, err := rating.NewConnection("./memes.db", logger)
+	if err != nil {
+		return App{}, func() {}, err
+	}
 
-	sqliteMemeStorage, closeFunc, err := rating.NewSqliteMemeStorage("./memes.db", logger)
+	sqliteMemeStorage, closeFunc, err := rating.NewSqliteMemeStorage(connection, logger)
 
 	if err != nil {
 		return App{}, closeFunc, err

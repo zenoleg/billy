@@ -2,7 +2,6 @@ package rating
 
 import (
 	"database/sql"
-	"fmt"
 	"sync"
 
 	_ "embed"
@@ -27,31 +26,23 @@ type (
 	}
 
 	SQLiteMemeStorage struct {
-		db     *sql.DB
-		logger zerolog.Logger
+		connection Connection
+		logger     zerolog.Logger
 	}
 )
 
-func NewSqliteMemeStorage(dbPath string, logger zerolog.Logger) (MemeStorage, func(), error) {
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&mode=rwc&_journal_mode=WAL", dbPath))
-	if err != nil {
-		logger.Err(err).Msg("Can not open SQLite storage")
-
-		return SQLiteMemeStorage{}, func() {}, err
-	}
-
+func NewSqliteMemeStorage(connection Connection, logger zerolog.Logger) (MemeStorage, func(), error) {
 	storage := SQLiteMemeStorage{
-		db:     db,
+		connection: connection,
+
 		logger: logger,
 	}
 
-	if err = storage.createTable(); err != nil {
+	if err := storage.createTable(); err != nil {
 		logger.Err(err).Msg("Can not create table")
 
 		return SQLiteMemeStorage{}, func() {}, err
 	}
-
-	logger.Info().Msg("📦 SQLite storage created successfully")
 
 	return storage, func() {
 		storage.close()
@@ -61,7 +52,7 @@ func NewSqliteMemeStorage(dbPath string, logger zerolog.Logger) (MemeStorage, fu
 func (s SQLiteMemeStorage) Get(id string) (Meme, error) {
 	meme := Meme{}
 
-	row := s.db.QueryRow("SELECT id, channel_id, member_id, score, timestamp, link FROM memes WHERE id = ?", id)
+	row := s.connection.QueryRow("SELECT id, channel_id, member_id, score, timestamp, link FROM memes WHERE id = ?", id)
 	err := row.Scan(&meme.id, &meme.channelID, &meme.memberID, &meme.score, &meme.timestamp, &meme.link)
 
 	if err != nil {
@@ -78,7 +69,7 @@ func (s SQLiteMemeStorage) Get(id string) (Meme, error) {
 }
 
 func (s SQLiteMemeStorage) Save(memes ...Meme) error {
-	tx, err := s.db.Begin()
+	tx, err := s.connection.Begin()
 	if err != nil {
 		return err
 	}
@@ -110,17 +101,13 @@ func (s SQLiteMemeStorage) Save(memes ...Meme) error {
 }
 
 func (s SQLiteMemeStorage) createTable() error {
-	_, err := s.db.Exec(sqliteSchema)
+	_, err := s.connection.Exec(sqliteSchema)
+
 	return err
 }
 
 func (s SQLiteMemeStorage) close() {
-	err := s.db.Close()
-	if err != nil {
-		s.logger.Err(err).Msg("Can not close SQLite storage")
-	}
-
-	s.logger.Info().Msg("SQLite storage closed")
+	s.connection.Close()
 }
 func NewInMemoryMemeStorage() MemeStorage {
 	return &InMemoryMemeStorage{memes: map[string]Meme{}, mx: sync.RWMutex{}}
