@@ -8,4 +8,11 @@ CREATE TABLE IF NOT EXISTS memes
     link       TEXT    NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS members
+(
+    id           TEXT NOT NULL PRIMARY KEY,
+    full_name    TEXT NOT NULL,
+    display_name TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_channel_id ON memes (channel_id);
