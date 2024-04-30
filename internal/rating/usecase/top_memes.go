@@ -54,16 +54,16 @@ func (p TopPreset) MakeFromAndTo(now time.Time) (time.Time, time.Time) {
 func (p TopPreset) Title() string {
 	switch p {
 	case TopDay:
-		return "🏆 Топ мемов за сегодня 🏆"
+		return "♂️️ Топ мемов за сегодня ♀️"
 	case TopWeek:
-		return "🏆 Топ мемов за неделю 🏆"
+		return "️️️♂️ Топ мемов за неделю ♀️"
 	case TopMonth:
-		return "🏆 Топ мемов за месяц 🏆"
+		return "️️♂️ Топ мемов за месяц ♀️"
 	case TopEver:
-		return "🏆 Топ мемов за все время 🏆"
+		return "️️♂️ Топ мемов за все время ♀️"
 	}
 
-	return "🏆 Топ мемов 🏆"
+	return "️️♂️ Топ мемов ♀️"
 }
 
 func NewTopMemesQuery(now time.Time, period TopPreset, channelID string) TopMemesQuery {

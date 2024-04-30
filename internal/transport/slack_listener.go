@@ -61,28 +61,28 @@ func (l SlackEventListener) Start(ctx context.Context) {
 
 						l.client.Ack(*evt.Request)
 
-					case "/top_posts_day":
+					case "/memes_day":
 						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopDay, data.ChannelID))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}
 
 						l.client.Ack(*evt.Request)
-					case "/top_posts_week":
+					case "/memes_week":
 						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopWeek, data.ChannelID))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}
 
 						l.client.Ack(*evt.Request)
-					case "/top_posts_month":
+					case "/memes_month":
 						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopMonth, data.ChannelID))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}
 
 						l.client.Ack(*evt.Request)
-					case "/top_posts_ever":
+					case "/memes_ever":
 						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopEver, data.ChannelID))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
