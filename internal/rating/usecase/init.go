@@ -5,7 +5,7 @@ import (
 
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/socketmode"
-	"github.com/zenoleg/binomeme/internal/rating"
+	"github.com/zenoleg/billy/internal/rating"
 )
 
 type InitRating struct {

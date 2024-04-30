@@ -10,8 +10,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
-	"github.com/zenoleg/binomeme/internal"
-	"github.com/zenoleg/binomeme/third_party/logger"
+	"github.com/zenoleg/billy/internal"
+	"github.com/zenoleg/billy/third_party/logger"
 )
 
 var version = "unknown"

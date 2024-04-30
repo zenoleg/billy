@@ -1,4 +1,4 @@
-module github.com/zenoleg/binomeme
+module github.com/zenoleg/billy
 
 go 1.22
 

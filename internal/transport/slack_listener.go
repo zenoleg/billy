@@ -9,8 +9,8 @@ import (
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
-	"github.com/zenoleg/binomeme/internal/rating"
-	"github.com/zenoleg/binomeme/internal/rating/usecase"
+	"github.com/zenoleg/billy/internal/rating"
+	"github.com/zenoleg/billy/internal/rating/usecase"
 )
 
 type SlackEventListener struct {

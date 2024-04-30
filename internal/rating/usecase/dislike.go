@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"github.com/rs/zerolog"
-	"github.com/zenoleg/binomeme/internal/rating"
+	"github.com/zenoleg/billy/internal/rating"
 )
 
 type (

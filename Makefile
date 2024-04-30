@@ -1,7 +1,7 @@
 .PHONY: run test lint
 
 run:
-	go run cmd/binomeme/main.go && ./binomeme
+	go run cmd/billy/main.go && ./billy
 
 test:
 	go test -race ./...

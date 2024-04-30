@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/rs/zerolog"
-	"github.com/zenoleg/binomeme/internal/rating"
-	"github.com/zenoleg/binomeme/internal/rating/usecase"
-	"github.com/zenoleg/binomeme/internal/transport"
+	"github.com/zenoleg/billy/internal/rating"
+	"github.com/zenoleg/billy/internal/rating/usecase"
+	"github.com/zenoleg/billy/internal/transport"
 )
 
 type App struct {
