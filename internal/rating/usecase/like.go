@@ -39,8 +39,9 @@ func NewLikeCommand(
 
 func NewLike(storage rating.MemeStorage, linkFetcher rating.LinkFetcher, logger zerolog.Logger) Like {
 	return Like{
-		storage: storage,
-		logger:  logger,
+		storage:     storage,
+		linkFetcher: linkFetcher,
+		logger:      logger,
 	}
 }
 
