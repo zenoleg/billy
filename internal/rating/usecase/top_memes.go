@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -93,24 +94,25 @@ func (h TopMemes) Handle(query TopMemesQuery) error {
 	message := strings.Builder{}
 	message.WriteString(fmt.Sprintf("%s\n\n", query.period.Title()))
 
-	placement := 1
+	i := 1
 	for _, view := range memeViews {
-		medal := ""
+		placement := ""
 
-		switch placement {
+		switch i {
 		case 1:
-			medal = "🥇 "
+			placement = "🥇 "
 		case 2:
-			medal = "🥈 "
+			placement = "🥈 "
 		case 3:
-			medal = "🥉 "
+			placement = "🥉 "
 		default:
+			placement = strconv.Itoa(i)
 		}
 
-		memeInfo := fmt.Sprintf("%s%d. <%s|От %s> (%d)\n", medal, placement, view.Link, view.MemberFullName, view.Score)
+		memeInfo := fmt.Sprintf("%s <%s|От %s> (%d)\n", placement, view.Link, view.MemberFullName, view.Score)
 		message.WriteString(memeInfo)
 
-		placement++
+		i++
 	}
 
 	_, _, err = h.client.PostMessage(query.channelID, slack.MsgOptionText(message.String(), false))
