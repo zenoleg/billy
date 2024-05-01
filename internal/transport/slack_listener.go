@@ -62,28 +62,28 @@ func (l SlackEventListener) Start(ctx context.Context) {
 						l.client.Ack(*evt.Request)
 
 					case "/memes_day":
-						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopDay, data.ChannelID))
+						err := l.top.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopDay))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/memes_week":
-						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopWeek, data.ChannelID))
+						err := l.top.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopWeek))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/memes_month":
-						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopMonth, data.ChannelID))
+						err := l.top.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopMonth))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/memes_ever":
-						err := l.top.Handle(usecase.NewTopMemesQuery(time.Now().UTC(), usecase.TopEver, data.ChannelID))
+						err := l.top.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopEver))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top rating")
 						}

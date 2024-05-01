@@ -25,9 +25,10 @@ type (
 	TopPreset uint8
 
 	TopMemesQuery struct {
-		now       time.Time
-		period    TopPreset
-		channelID string
+		requestMemberID rating.MemberID
+		channelID       string
+		now             time.Time
+		period          TopPreset
 	}
 
 	TopMemes struct {
@@ -67,11 +68,12 @@ func (p TopPreset) Title() string {
 	return "️️♂️ Топ мемов ♀️"
 }
 
-func NewTopMemesQuery(now time.Time, period TopPreset, channelID string) TopMemesQuery {
+func NewTopMemesQuery(requestMemberID string, channelID string, now time.Time, period TopPreset) TopMemesQuery {
 	return TopMemesQuery{
-		now:       now,
-		period:    period,
-		channelID: channelID,
+		requestMemberID: rating.NewMemberID(requestMemberID),
+		channelID:       channelID,
+		now:             now,
+		period:          period,
 	}
 }
 
@@ -115,7 +117,7 @@ func (h TopMemes) Handle(query TopMemesQuery) error {
 		i++
 	}
 
-	_, _, err = h.client.PostMessage(query.channelID, slack.MsgOptionText(message.String(), false), slack.MsgOptionDisableLinkUnfurl())
+	_, err = h.client.PostEphemeral(query.channelID, string(query.requestMemberID), slack.MsgOptionText(message.String(), false))
 
 	return err
 }
