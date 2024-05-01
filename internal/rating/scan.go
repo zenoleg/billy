@@ -17,17 +17,17 @@ type (
 	}
 
 	SlackMemeScanner struct {
-		client      *socketmode.Client
-		linkFetcher LinkFetcher
+		client             *socketmode.Client
+		channelInfoFetcher ChannelInfoFetcher
 	}
 )
 
-func NewSlackMemeScanner(client *socketmode.Client, linkFetcher LinkFetcher, logger zerolog.Logger) MemeScanner {
+func NewSlackMemeScanner(client *socketmode.Client, channelInfoFetcher ChannelInfoFetcher, logger zerolog.Logger) MemeScanner {
 	return LoggedScanner{
 		logger: logger,
 		memeScanner: SlackMemeScanner{
-			client:      client,
-			linkFetcher: linkFetcher,
+			client:             client,
+			channelInfoFetcher: channelInfoFetcher,
 		},
 	}
 }
@@ -66,9 +66,11 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 					NewMemberID(message.User),
 					NewReactions(reactions),
 					message.Timestamp,
-					s.linkFetcher.Fetch(message.Timestamp, channelID),
+					s.channelInfoFetcher.FetchMemeLink(message.Timestamp, channelID),
 				),
 			)
+
+			members = append(members, s.channelInfoFetcher.FetchMember(NewMemberID(message.User)))
 		}
 
 		if !conversationResponse.HasMore {

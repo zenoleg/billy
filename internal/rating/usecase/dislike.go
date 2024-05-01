@@ -15,9 +15,9 @@ type (
 	}
 
 	Dislike struct {
-		storage     rating.MemeStorage
-		linkFetcher rating.LinkFetcher
-		logger      zerolog.Logger
+		storage            rating.MemeStorage
+		channelInfoFetcher rating.ChannelInfoFetcher
+		logger             zerolog.Logger
 	}
 )
 
@@ -37,11 +37,11 @@ func NewDislikeCommand(
 	}
 }
 
-func NewDislike(storage rating.MemeStorage, linkFetcher rating.LinkFetcher, logger zerolog.Logger) Dislike {
+func NewDislike(storage rating.MemeStorage, channelInfoFetcher rating.ChannelInfoFetcher, logger zerolog.Logger) Dislike {
 	return Dislike{
-		storage:     storage,
-		linkFetcher: linkFetcher,
-		logger:      logger,
+		storage:            storage,
+		channelInfoFetcher: channelInfoFetcher,
+		logger:             logger,
 	}
 }
 
@@ -54,7 +54,7 @@ func (l Dislike) Handle(command DislikeCommand) error {
 			command.MemberID,
 			rating.NewReactions([]rating.Reaction{command.Reaction}),
 			command.Timestamp,
-			l.linkFetcher.Fetch(command.MemeID, command.ChannelID),
+			l.channelInfoFetcher.FetchMemeLink(command.MemeID, command.ChannelID),
 		)
 	}
 

@@ -16,7 +16,7 @@ type (
 
 	Like struct {
 		storage     rating.MemeStorage
-		linkFetcher rating.LinkFetcher
+		linkFetcher rating.ChannelInfoFetcher
 		logger      zerolog.Logger
 	}
 )
@@ -37,7 +37,7 @@ func NewLikeCommand(
 	}
 }
 
-func NewLike(storage rating.MemeStorage, linkFetcher rating.LinkFetcher, logger zerolog.Logger) Like {
+func NewLike(storage rating.MemeStorage, linkFetcher rating.ChannelInfoFetcher, logger zerolog.Logger) Like {
 	return Like{
 		storage:     storage,
 		linkFetcher: linkFetcher,
@@ -54,7 +54,7 @@ func (l Like) Handle(command LikeCommand) error {
 			command.MemberID,
 			rating.NewReactions([]rating.Reaction{command.Reaction}),
 			command.Timestamp,
-			l.linkFetcher.Fetch(command.MemeID, command.ChannelID),
+			l.linkFetcher.FetchMemeLink(command.MemeID, command.ChannelID),
 		)
 	}
 
