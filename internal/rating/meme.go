@@ -1,7 +1,5 @@
 package rating
 
-import "slices"
-
 type (
 	MemberID string
 
@@ -79,17 +77,7 @@ func (r Reaction) String() string {
 }
 
 func (r Reaction) Score() int {
-	if slices.Contains([]string{"+1"}, r.reaction) {
-		return 1 * r.count
-	}
-	if slices.Contains([]string{"omegalul"}, r.reaction) {
-		return 2 * r.count
-	}
-	if slices.Contains([]string{"kekw"}, r.reaction) {
-		return 3 * r.count
-	}
-
-	return 0
+	return 1
 }
 
 func (r Reactions) Score() int {
