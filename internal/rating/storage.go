@@ -9,8 +9,11 @@ import (
 	"github.com/rs/zerolog"
 )
 
-//go:embed schema.sql
-var sqliteSchema string
+//go:embed meme_schema.sql
+var memeSchema string
+
+//go:embed member_schema.sql
+var memberSchema string
 
 type (
 	MemeStorage interface {
@@ -18,13 +21,23 @@ type (
 		Save(memes ...Meme) error
 	}
 
+	MemberStorage interface {
+		Get(id MemberID) (Member, error)
+		Save(members ...Member) error
+	}
+
 	SQLiteMemeStorage struct {
+		connection Connection
+		logger     zerolog.Logger
+	}
+
+	SQLiteMemberStorage struct {
 		connection Connection
 		logger     zerolog.Logger
 	}
 )
 
-func NewSqliteMemeStorage(connection Connection, logger zerolog.Logger) (MemeStorage, func(), error) {
+func NewSqliteMemeStorage(connection Connection, logger zerolog.Logger) (MemeStorage, error) {
 	storage := SQLiteMemeStorage{
 		connection: connection,
 
@@ -34,12 +47,10 @@ func NewSqliteMemeStorage(connection Connection, logger zerolog.Logger) (MemeSto
 	if err := storage.createTable(); err != nil {
 		logger.Err(err).Msg("Can not create table")
 
-		return SQLiteMemeStorage{}, func() {}, err
+		return SQLiteMemeStorage{}, err
 	}
 
-	return storage, func() {
-		storage.close()
-	}, nil
+	return storage, nil
 }
 
 func (s SQLiteMemeStorage) Get(id string) (Meme, error) {
@@ -94,11 +105,88 @@ func (s SQLiteMemeStorage) Save(memes ...Meme) error {
 }
 
 func (s SQLiteMemeStorage) createTable() error {
-	_, err := s.connection.Exec(sqliteSchema)
+	_, err := s.connection.Exec(memeSchema)
 
 	return err
 }
 
 func (s SQLiteMemeStorage) close() {
+	s.connection.Close()
+}
+
+func NewSqliteMemberStorage(connection Connection, logger zerolog.Logger) (MemberStorage, error) {
+	storage := SQLiteMemberStorage{
+		connection: connection,
+
+		logger: logger,
+	}
+
+	if err := storage.createTable(); err != nil {
+		logger.Err(err).Msg("Can not create table")
+
+		return SQLiteMemberStorage{}, err
+	}
+
+	return storage, nil
+}
+
+func (s SQLiteMemberStorage) Get(id MemberID) (Member, error) {
+	member := Member{}
+
+	row := s.connection.QueryRow("SELECT id, full_name, display_name FROM members WHERE id = ?", id)
+	err := row.Scan(&member.id, &member.fullName, &member.displayName)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Member{}, errors.Errorf("Member with ID %s not found", id)
+		}
+
+		s.logger.Err(err).Msg("Can not fetch a Member")
+
+		return Member{}, err
+	}
+
+	return member, nil
+}
+
+func (s SQLiteMemberStorage) Save(members ...Member) error {
+	tx, err := s.connection.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+
+			return
+		}
+
+		err = tx.Commit()
+	}()
+
+	stmt, err := tx.Prepare("INSERT OR REPLACE INTO members(id, full_name, display_name) VALUES (?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, member := range members {
+		_, err = stmt.Exec(member.id, member.fullName, member.displayName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s SQLiteMemberStorage) createTable() error {
+	_, err := s.connection.Exec(memberSchema)
+
+	return err
+}
+
+func (s SQLiteMemberStorage) close() {
 	s.connection.Close()
 }

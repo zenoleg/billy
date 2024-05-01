@@ -27,16 +27,29 @@ func MakeApp(logger zerolog.Logger) (App, func(), error) {
 		return App{}, func() {}, err
 	}
 
-	sqliteMemeStorage, closeFunc, err := rating.NewSqliteMemeStorage(connection, logger)
-
+	sqliteMemeStorage, err := rating.NewSqliteMemeStorage(connection, logger)
 	if err != nil {
-		return App{}, closeFunc, err
+		return App{}, func() {
+			connection.Close()
+		}, err
+	}
+
+	sqliteMemberStorage, err := rating.NewSqliteMemberStorage(connection, logger)
+	if err != nil {
+		return App{}, func() {
+			connection.Close()
+		}, err
 	}
 
 	linkFetcher := rating.NewSlackLinkFetcher(client, logger)
 	topMemeFetcher := rating.NewSQLiteTopMemeFetcher(connection, logger)
 
-	initRating := usecase.NewInitRating(sqliteMemeStorage, rating.NewSlackMemeScanner(client, linkFetcher, logger), client)
+	initRating := usecase.NewInitRating(
+		sqliteMemeStorage,
+		sqliteMemberStorage,
+		rating.NewSlackMemeScanner(client, linkFetcher, logger),
+		client,
+	)
 	like := usecase.NewLike(sqliteMemeStorage, linkFetcher, logger)
 	top := usecase.NewTop(topMemeFetcher, client, logger)
 	dislike := usecase.NewDislike(sqliteMemeStorage, linkFetcher, logger)
@@ -50,7 +63,9 @@ func MakeApp(logger zerolog.Logger) (App, func(), error) {
 		logger,
 	)
 
-	return App{bot: bot, listener: listener}, closeFunc, nil
+	return App{bot: bot, listener: listener}, func() {
+		connection.Close()
+	}, nil
 }
 
 func (app App) Start(ctx context.Context) error {

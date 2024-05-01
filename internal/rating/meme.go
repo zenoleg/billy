@@ -4,15 +4,18 @@ import "slices"
 
 type (
 	MemberID string
+
 	Reaction struct {
 		reaction string
 		count    int
 	}
+
 	Reactions []Reaction
 
 	Member struct {
-		id   MemberID
-		name string
+		id          MemberID
+		fullName    string
+		displayName string
 	}
 
 	Meme struct {
@@ -52,8 +55,12 @@ func NewMemberID(value string) MemberID {
 	return MemberID(value)
 }
 
-func NewMember(ID MemberID, name string) Member {
-	return Member{id: ID, name: name}
+func NewMember(ID MemberID, fullName string, displayName string) Member {
+	return Member{
+		id:          ID,
+		fullName:    fullName,
+		displayName: displayName,
+	}
 }
 
 func NewReaction(reaction string, count int) Reaction {

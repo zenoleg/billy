@@ -9,16 +9,23 @@ import (
 )
 
 type InitRating struct {
-	storage     rating.MemeStorage
-	memeScanner rating.MemeScanner
-	client      *socketmode.Client
+	memeStorage   rating.MemeStorage
+	memberStorage rating.MemberStorage
+	memeScanner   rating.MemeScanner
+	client        *socketmode.Client
 }
 
-func NewInitRating(storage rating.MemeStorage, memeScanner rating.MemeScanner, client *socketmode.Client) InitRating {
+func NewInitRating(
+	memeStorage rating.MemeStorage,
+	memberStorage rating.MemberStorage,
+	memeScanner rating.MemeScanner,
+	client *socketmode.Client,
+) InitRating {
 	return InitRating{
-		storage:     storage,
-		memeScanner: memeScanner,
-		client:      client,
+		memeStorage:   memeStorage,
+		memberStorage: memberStorage,
+		memeScanner:   memeScanner,
+		client:        client,
 	}
 }
 
@@ -28,7 +35,7 @@ func (r InitRating) Handle(channelID string) error {
 		return err
 	}
 
-	err = r.storage.Save(memes...)
+	err = r.memeStorage.Save(memes...)
 	if err != nil {
 		return err
 	}
