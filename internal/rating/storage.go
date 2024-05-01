@@ -9,10 +9,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
-//go:embed meme_schema.sql
+//go:embed scheme/meme_schema.sql
 var memeSchema string
 
-//go:embed member_schema.sql
+//go:embed scheme/member_schema.sql
 var memberSchema string
 
 type (
