@@ -43,7 +43,7 @@ func NewTopMemeCriterion(from time.Time, to time.Time, limit int) TopCriterion {
 	}
 }
 
-func NewSQLiteTopMemeFetcher(connection Connection, logger zerolog.Logger) TopFetcher {
+func NewSQLiteTopFetcher(connection Connection, logger zerolog.Logger) TopFetcher {
 	return SQLiteTopMemeFetcher{connection: connection, logger: logger}
 }
 

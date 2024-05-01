@@ -77,7 +77,7 @@ func NewTopMemesQuery(requestMemberID string, channelID string, now time.Time, p
 	}
 }
 
-func NewTop(fetcher rating.TopFetcher, client *socketmode.Client, logger zerolog.Logger) TopMemes {
+func NewTopMemes(fetcher rating.TopFetcher, client *socketmode.Client, logger zerolog.Logger) TopMemes {
 	return TopMemes{
 		fetcher: fetcher,
 		client:  client,
