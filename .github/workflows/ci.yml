@@ -47,6 +47,9 @@ jobs:
       - golangci
       - build-and-test
     runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
     if: github.event_name != 'pull_request'
     steps:
       - name: Check out Git repository
