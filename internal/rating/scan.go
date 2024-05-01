@@ -8,7 +8,7 @@ import (
 
 type (
 	MemeScanner interface {
-		Scan(channelID string) ([]Meme, error)
+		Scan(channelID string) ([]Meme, []Member, error)
 	}
 
 	LoggedScanner struct {
@@ -32,18 +32,19 @@ func NewSlackMemeScanner(client *socketmode.Client, linkFetcher LinkFetcher, log
 	}
 }
 
-func (s SlackMemeScanner) Scan(channelID string) ([]Meme, error) {
+func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 	historyParams := slack.GetConversationHistoryParameters{
 		ChannelID: channelID,
 		Limit:     999,
 	}
 
-	memes := make([]Meme, 0, 300)
+	memes := make([]Meme, 0, 100)
+	members := make([]Member, 0, 10)
 
 	for {
 		conversationResponse, err := s.client.GetConversationHistory(&historyParams)
 		if err != nil {
-			return []Meme{}, err
+			return []Meme{}, []Member{}, err
 		}
 
 		for _, message := range conversationResponse.Messages {
@@ -77,18 +78,18 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, error) {
 		historyParams.Cursor = conversationResponse.ResponseMetadata.Cursor
 	}
 
-	return memes, nil
+	return memes, members, nil
 }
 
-func (l LoggedScanner) Scan(channelID string) ([]Meme, error) {
-	memes, err := l.memeScanner.Scan(channelID)
+func (l LoggedScanner) Scan(channelID string) ([]Meme, []Member, error) {
+	memes, members, err := l.memeScanner.Scan(channelID)
 	if err != nil {
 		l.logger.Err(err).Str("channel_id", channelID).Msg("❌ Can not scan channel conversation")
 
-		return []Meme{}, err
+		return []Meme{}, []Member{}, err
 	}
 
 	l.logger.Info().Int("meme_count", len(memes)).Str("channel_id", channelID).Msg("✅ Channel conversation scanned successfully")
 
-	return memes, nil
+	return memes, members, nil
 }
