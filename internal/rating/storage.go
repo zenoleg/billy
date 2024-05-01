@@ -110,10 +110,6 @@ func (s SQLiteMemeStorage) createTable() error {
 	return err
 }
 
-func (s SQLiteMemeStorage) close() {
-	s.connection.Close()
-}
-
 func NewSqliteMemberStorage(connection Connection, logger zerolog.Logger) (MemberStorage, error) {
 	storage := SQLiteMemberStorage{
 		connection: connection,
@@ -185,8 +181,4 @@ func (s SQLiteMemberStorage) createTable() error {
 	_, err := s.connection.Exec(memberSchema)
 
 	return err
-}
-
-func (s SQLiteMemberStorage) close() {
-	s.connection.Close()
 }

@@ -32,7 +32,7 @@ type (
 	}
 
 	TopMemes struct {
-		fetcher rating.TopMemeFetcher
+		fetcher rating.TopFetcher
 		client  *socketmode.Client
 		logger  zerolog.Logger
 	}
@@ -77,7 +77,7 @@ func NewTopMemesQuery(requestMemberID string, channelID string, now time.Time, p
 	}
 }
 
-func NewTop(fetcher rating.TopMemeFetcher, client *socketmode.Client, logger zerolog.Logger) TopMemes {
+func NewTop(fetcher rating.TopFetcher, client *socketmode.Client, logger zerolog.Logger) TopMemes {
 	return TopMemes{
 		fetcher: fetcher,
 		client:  client,
@@ -88,7 +88,7 @@ func NewTop(fetcher rating.TopMemeFetcher, client *socketmode.Client, logger zer
 func (h TopMemes) Handle(query TopMemesQuery) error {
 	from, to := query.period.MakeFromAndTo(time.Now().UTC())
 
-	memeViews, err := h.fetcher.Fetch(rating.NewTopMemeCriterion(from, to, defaultLimit))
+	memeViews, err := h.fetcher.FetchTopMemes(rating.NewTopMemeCriterion(from, to, defaultLimit))
 	if err != nil {
 		return err
 	}
