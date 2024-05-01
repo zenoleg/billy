@@ -77,7 +77,7 @@ func (r Reaction) String() string {
 }
 
 func (r Reaction) Score() int {
-	return 1
+	return 1 * r.count
 }
 
 func (r Reactions) Score() int {
