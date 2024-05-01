@@ -19,9 +19,10 @@ type (
 	}
 
 	TopCriterion struct {
-		from  time.Time
-		to    time.Time
-		limit int
+		from      time.Time
+		to        time.Time
+		channelID string
+		limit     int
 	}
 
 	TopFetcher interface {
@@ -35,11 +36,12 @@ type (
 	}
 )
 
-func NewTopMemeCriterion(from time.Time, to time.Time, limit int) TopCriterion {
+func NewTopMemeCriterion(from time.Time, to time.Time, channelID string, limit int) TopCriterion {
 	return TopCriterion{
-		from:  from,
-		to:    to,
-		limit: limit,
+		from:      from,
+		to:        to,
+		channelID: channelID,
+		limit:     limit,
 	}
 }
 
@@ -48,10 +50,19 @@ func NewSQLiteTopFetcher(connection Connection, logger zerolog.Logger) TopFetche
 }
 
 func (s SQLiteTopMemeFetcher) FetchTopMemes(criterion TopCriterion) ([]TopMemeView, error) {
+	query := `
+		SELECT meme.link, COALESCE(member.full_name, 'Неизвестно кто'), meme.score 
+		FROM memes meme LEFT JOIN members member ON meme.member_id = member.id
+		WHERE meme.timestamp BETWEEN ? AND ? AND meme.channel_id = ?
+		ORDER BY score DESC
+		LIMIT ?
+	`
+
 	rows, err := s.connection.Query(
-		"SELECT meme.link, COALESCE(member.full_name, 'Неизвестно кто'), meme.score FROM memes meme LEFT JOIN members member ON meme.member_id = member.id WHERE timestamp BETWEEN ? AND ? ORDER BY score DESC LIMIT ?",
+		query,
 		criterion.from.Unix(),
 		criterion.to.Unix(),
+		criterion.channelID,
 		criterion.limit,
 	)
 
@@ -84,6 +95,7 @@ func (s SQLiteTopMemeFetcher) FetchTopAuthors(criterion TopCriterion) ([]TopAuth
 		SELECT member.full_name, sum(meme.score) AS score FROM memes meme
 		LEFT JOIN main.members member on member.id = meme.member_id
 		WHERE meme.timestamp BETWEEN ? AND ?
+		AND meme.channel_id = ?
 		GROUP BY member.full_name
 		ORDER BY score DESC
 		LIMIT ?
@@ -93,6 +105,7 @@ func (s SQLiteTopMemeFetcher) FetchTopAuthors(criterion TopCriterion) ([]TopAuth
 		query,
 		criterion.from.Unix(),
 		criterion.to.Unix(),
+		criterion.channelID,
 		criterion.limit,
 	)
 
