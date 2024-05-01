@@ -1,7 +1,10 @@
-.PHONY: run test lint
+.PHONY: dc run test lint
+
+dc:
+	docker-compose up  --remove-orphans --build
 
 run:
-	go run cmd/billy/main.go && ./billy
+	go build -o billy cmd/billy/main.go && ./billy
 
 test:
 	go test -race ./...
