@@ -64,49 +64,49 @@ func (l SlackEventListener) Start(ctx context.Context) {
 						l.client.Ack(*evt.Request)
 
 					case "/memes_day":
-						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopDay))
+						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopDay))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top memes rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/memes_week":
-						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopWeek))
+						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopWeek))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top memes rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/memes_month":
-						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopMonth))
+						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopMonth))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top memes rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/memes_ever":
-						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopEver))
+						err := l.topMemes.Handle(usecase.NewTopMemesQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopEver))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top memes rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/authors_week":
-						err := l.topAuthors.Handle(usecase.NewTopAuthorsQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopWeek))
+						err := l.topAuthors.Handle(usecase.NewTopAuthorsQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopWeek))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top authors rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/authors_month":
-						err := l.topAuthors.Handle(usecase.NewTopAuthorsQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopMonth))
+						err := l.topAuthors.Handle(usecase.NewTopAuthorsQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopMonth))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top authors rating")
 						}
 
 						l.client.Ack(*evt.Request)
 					case "/authors_ever":
-						err := l.topAuthors.Handle(usecase.NewTopAuthorsQuery(data.UserID, data.ChannelID, time.Now().UTC(), usecase.TopEver))
+						err := l.topAuthors.Handle(usecase.NewTopAuthorsQuery(data.UserID, data.ChannelID, time.Now().UTC(), rating.TopEver))
 						if err != nil {
 							l.logger.Err(err).Msg("Can not fetch top authors rating")
 						}

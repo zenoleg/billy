@@ -1,9 +1,6 @@
 package usecase
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -14,21 +11,14 @@ import (
 
 const (
 	defaultLimit = 10
-
-	TopDay TopPreset = iota
-	TopWeek
-	TopMonth
-	TopEver
 )
 
 type (
-	TopPreset uint8
-
 	TopMemesQuery struct {
 		requestMemberID rating.MemberID
 		channelID       string
 		now             time.Time
-		period          TopPreset
+		period          rating.PeriodPreset
 	}
 
 	TopMemes struct {
@@ -38,37 +28,7 @@ type (
 	}
 )
 
-func (p TopPreset) MakeFromAndTo(now time.Time) (time.Time, time.Time) {
-	switch p {
-	case TopDay:
-		return now.Add(-time.Hour * 24), now
-	case TopWeek:
-		return now.Add(-time.Hour * 24 * 7), now
-	case TopMonth:
-		return now.Add(-time.Hour * 24 * 30), now
-	case TopEver:
-		return time.Unix(0, 0), now
-	}
-
-	return time.Time{}, time.Time{}
-}
-
-func (p TopPreset) Title() string {
-	switch p {
-	case TopDay:
-		return "♂️️ Топ мемов за сегодня ♀️"
-	case TopWeek:
-		return "️️️♂️ Топ мемов за неделю ♀️"
-	case TopMonth:
-		return "️️♂️ Топ мемов за месяц ♀️"
-	case TopEver:
-		return "️️♂️ Топ мемов за все время ♀️"
-	}
-
-	return "️️♂️ Топ мемов ♀️"
-}
-
-func NewTopMemesQuery(requestMemberID string, channelID string, now time.Time, period TopPreset) TopMemesQuery {
+func NewTopMemesQuery(requestMemberID string, channelID string, now time.Time, period rating.PeriodPreset) TopMemesQuery {
 	return TopMemesQuery{
 		requestMemberID: rating.NewMemberID(requestMemberID),
 		channelID:       channelID,
@@ -93,31 +53,11 @@ func (h TopMemes) Handle(query TopMemesQuery) error {
 		return err
 	}
 
-	message := strings.Builder{}
-	message.WriteString(fmt.Sprintf("%s\n\n", query.period.Title()))
-
-	i := 1
-	for _, view := range memeViews {
-		placement := ""
-
-		switch i {
-		case 1:
-			placement = "🥇 "
-		case 2:
-			placement = "🥈 "
-		case 3:
-			placement = "🥉 "
-		default:
-			placement = strconv.Itoa(i)
-		}
-
-		memeInfo := fmt.Sprintf("%s <%s|От %s> (%d)\n", placement, view.Link, view.MemberFullName, view.Score)
-		message.WriteString(memeInfo)
-
-		i++
-	}
-
-	_, err = h.client.PostEphemeral(query.channelID, string(query.requestMemberID), slack.MsgOptionText(message.String(), false))
+	_, err = h.client.PostEphemeral(
+		query.channelID,
+		string(query.requestMemberID),
+		slack.MsgOptionText(rating.NewTopMemesTemplate(memeViews, query.period).String(), false),
+	)
 
 	return err
 }
