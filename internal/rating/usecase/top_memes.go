@@ -48,7 +48,7 @@ func NewTopMemes(fetcher rating.TopFetcher, client *socketmode.Client, logger ze
 func (h TopMemes) Handle(query TopMemesQuery) error {
 	from, to := query.period.MakeFromAndTo(time.Now().UTC())
 
-	memeViews, err := h.fetcher.FetchTopMemes(rating.NewTopMemeCriterion(from, to, defaultLimit))
+	memeViews, err := h.fetcher.FetchTopMemes(rating.NewTopMemeCriterion(from, to, query.channelID, defaultLimit))
 	if err != nil {
 		return err
 	}

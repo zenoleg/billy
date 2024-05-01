@@ -44,7 +44,7 @@ func NewTopAuthors(fetcher rating.TopFetcher, client *socketmode.Client, logger 
 func (h TopAuthors) Handle(query TopAuthorsQuery) error {
 	from, to := query.period.MakeFromAndTo(time.Now().UTC())
 
-	authorViews, err := h.fetcher.FetchTopAuthors(rating.NewTopMemeCriterion(from, to, defaultLimit))
+	authorViews, err := h.fetcher.FetchTopAuthors(rating.NewTopMemeCriterion(from, to, query.channelID, defaultLimit))
 	if err != nil {
 		return err
 	}
