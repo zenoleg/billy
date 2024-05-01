@@ -4,7 +4,6 @@ go 1.22
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/rs/zerolog v1.32.0
 	github.com/slack-go/slack v0.12.3

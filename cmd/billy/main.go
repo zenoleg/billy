@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/zenoleg/billy/internal"
 	"github.com/zenoleg/billy/third_party/logger"
@@ -29,11 +28,6 @@ func main() {
 func run() error {
 	zerolog.DurationFieldUnit = time.Microsecond
 	log := logger.NewLogger(logger.NewConfig(), version)
-
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal().Err(err).Msg("Can not load .env")
-	}
 
 	app, closeFunc, err := internal.MakeApp(log)
 	defer closeFunc()

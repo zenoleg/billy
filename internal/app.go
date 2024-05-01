@@ -22,7 +22,7 @@ func MakeApp(logger zerolog.Logger) (App, func(), error) {
 
 	client := transport.NewSlackClient(config, logger)
 	bot := transport.NewSlackBot(client, logger)
-	connection, err := rating.NewConnection("./memes.db", logger)
+	connection, err := rating.NewConnection("./data/memes.db", logger)
 	if err != nil {
 		return App{}, func() {}, err
 	}
