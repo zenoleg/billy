@@ -1,0 +1,15 @@
+version: '3.8'
+
+volumes:
+  billy_data:
+
+services:
+  billy:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - billy_data:/app/data
+    env_file:
+      - .env

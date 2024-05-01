@@ -1,0 +1,73 @@
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22
+
+      - name: Build
+        run: go build -v cmd/billy/*.go
+
+      - name: Test
+        run: go test -v ./...
+
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.22
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54.2
+          args: --timeout=10m
+
+
+  push-to-registry:
+    needs:
+      - golangci
+      - build-and-test
+    runs-on: ubuntu-20.04
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, tag, and push image to GCR
+        env:
+          GCR_REGISTRY: gcr.io/pr-binom
+          GCR_REPOSITORY: binom-billy
+          COMMIT_TAG: ${{ github.ref_name }}
+        run: |
+          DOCKER_BUILDKIT=1 docker buildx build --push \
+          --build-arg VER=$COMMIT_TAG \
+          -t ghcr.io/zenoleg/billy:$COMMIT_TAG \
+          -t ghcr.io/zenoleg/billy:latest \
+          -f Dockerfile \
+          .
