@@ -1,6 +1,8 @@
 package rating
 
 import (
+	"slices"
+
 	"github.com/rs/zerolog"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/socketmode"
@@ -39,6 +41,8 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 	}
 
 	memes := make([]Meme, 0, 100)
+
+	existedMembers := make([]MemberID, 0, 10)
 	members := make([]Member, 0, 10)
 
 	for {
@@ -70,7 +74,10 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 				),
 			)
 
-			members = append(members, s.channelInfoFetcher.FetchMember(NewMemberID(message.User)))
+			if !slices.Contains(existedMembers, NewMemberID(message.User)) {
+				members = append(members, s.channelInfoFetcher.FetchMember(NewMemberID(message.User)))
+				existedMembers = append(existedMembers, NewMemberID(message.User))
+			}
 		}
 
 		if !conversationResponse.HasMore {
