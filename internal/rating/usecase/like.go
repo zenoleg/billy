@@ -52,7 +52,7 @@ func (l Like) Handle(command LikeCommand) error {
 			command.MemeID,
 			command.ChannelID,
 			command.MemberID,
-			rating.NewReactions([]rating.Reaction{command.Reaction}),
+			rating.NewReactions([]rating.Reaction{}),
 			command.Timestamp,
 			l.linkFetcher.FetchMemeLink(command.MemeID, command.ChannelID),
 		)
