@@ -115,7 +115,7 @@ func (h TopMemes) Handle(query TopMemesQuery) error {
 		i++
 	}
 
-	_, _, err = h.client.PostMessage(query.channelID, slack.MsgOptionText(message.String(), false))
+	_, _, err = h.client.PostMessage(query.channelID, slack.MsgOptionText(message.String(), false), slack.MsgOptionDisableLinkUnfurl())
 
 	return err
 }
