@@ -39,10 +39,10 @@ func NewSlackMemeScanner(client *socketmode.Client, channelInfoFetcher ChannelIn
 func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 	historyParams := slack.GetConversationHistoryParameters{
 		ChannelID: channelID,
-		Limit:     100,
+		Limit:     500,
 	}
 
-	memes := make([]Meme, 0, 300)
+	memes := make([]Meme, 0, 500)
 
 	existedMembers := make([]MemberID, 0, 10)
 	members := make([]Member, 0, 10)
