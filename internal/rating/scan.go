@@ -92,7 +92,7 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 
 		batchCount++
 
-		s.logger.Info().Int("batch", batchCount).Msg("Conversation history batch fetched")
+		s.logger.Info().Int("batch", batchCount).Msg("🤣 Conversation history batch fetched")
 	}
 
 	return memes, members, nil
