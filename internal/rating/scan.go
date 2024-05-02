@@ -47,13 +47,15 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 	existedMembers := make([]MemberID, 0, 10)
 	members := make([]Member, 0, 10)
 
+	batchCount := 0
+
 	for {
 		conversationResponse, err := s.client.GetConversationHistory(&historyParams)
 		if err != nil {
 			return []Meme{}, []Member{}, err
 		}
 
-		for i, message := range conversationResponse.Messages {
+		for _, message := range conversationResponse.Messages {
 			if len(message.Files) == 0 {
 				// ignore message if there is no meme inside
 				continue
@@ -80,8 +82,6 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 				members = append(members, s.channelInfoFetcher.FetchMember(NewMemberID(message.User)))
 				existedMembers = append(existedMembers, NewMemberID(message.User))
 			}
-
-			s.logger.Info().Int("batch", i).Msg("History batch fetched")
 		}
 
 		if !conversationResponse.HasMore {
@@ -89,6 +89,10 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 		}
 
 		historyParams.Cursor = conversationResponse.ResponseMetadata.Cursor
+
+		batchCount++
+
+		s.logger.Info().Int("batch", batchCount).Msg("Conversation history batch fetched")
 	}
 
 	return memes, members, nil
