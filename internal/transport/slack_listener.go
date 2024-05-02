@@ -56,6 +56,8 @@ func (l SlackEventListener) Start(ctx context.Context) {
 					data := evt.Data.(slack.SlashCommand)
 					switch data.Command {
 					case "/init":
+						l.logger.Info().Msg("Slack init event received")
+
 						err := l.initRating.Handle(data.ChannelID)
 						if err != nil {
 							l.logger.Err(err).Msg("Can not initialize rating")
