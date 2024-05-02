@@ -38,8 +38,9 @@ func NewSlackMemeScanner(client *socketmode.Client, channelInfoFetcher ChannelIn
 
 func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 	historyParams := slack.GetConversationHistoryParameters{
-		ChannelID: channelID,
-		Limit:     500,
+		ChannelID:          channelID,
+		Limit:              500,
+		IncludeAllMetadata: true,
 	}
 
 	memes := make([]Meme, 0, 500)
@@ -88,11 +89,14 @@ func (s SlackMemeScanner) Scan(channelID string) ([]Meme, []Member, error) {
 			break
 		}
 
-		historyParams.Cursor = conversationResponse.ResponseMetadata.Cursor
+		historyParams.Cursor = conversationResponse.ResponseMetaData.NextCursor
 
 		batchCount++
 
-		s.logger.Info().Int("batch", batchCount).Msg("🤣 Conversation history batch fetched")
+		s.logger.Info().
+			Int("batch", batchCount).
+			Str("next_cursor", conversationResponse.ResponseMetaData.NextCursor).
+			Msg("🤣 Conversation history batch fetched")
 	}
 
 	return memes, members, nil
